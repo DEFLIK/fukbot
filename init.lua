@@ -1,14 +1,22 @@
---local component = require('component') -- подгрузить обертку из OpenOS
---local computer = require('computer')
+local component = require('component') -- подгрузить обертку из OpenOS
+local computer = require('computer')
 local event = require("event")
 
-msg,receiverAddress,senderAddress,port,distance,message = event.pull("modem_message")
-		print(message)
+component.modem.open(1339)
+print("Bot Yanni | by 4sv DEFLIK :)")
+print("Порт связи: 1339")
+print("Ожидаем конфигурации с главного компьютера...")
+msg,receiverAddress,senderAddress,port,distance,messageK = event.pull("modem_message")
+print(">Конфигурация получена<")
+print("Кол-во чанков: ", messageK)
+print("Получено от: ", senderAddress)
+print("Дистанция отправки: ", distance)
+print("Робот приступил к рабству...")
 
 
-local chunks = 2 -- количество чанков для добычи
+local chunks = messageK -- количество чанков для добычи
 local min, max = 2.2, 40 -- минимальная и максимальная плотность
-local port = 1 -- порт для взаимодействия с роботом
+local port = 1339 -- порт для взаимодействия с роботом
 local X, Y, Z, D, border = 0, 0, 0, 0 -- переменные локальной системы координат
 local steps, turns = 0, 0 -- debug
 local WORLD = {x = {}, y = {}, z = {}} -- таблица меток
