@@ -1,7 +1,6 @@
 local component = require('component') -- подгрузить обертку из OpenOS
 local computer = require('computer')
 local event = require("event")
-
 component.modem.open(1339)
 print("Bot Yanni | by 4sv DEFLIK :)")
 print("Порт связи: 1339")
@@ -12,11 +11,10 @@ print("Кол-во чанков: ", messageK)
 print("Получено от: ", senderAddress)
 print("Дистанция отправки: ", distance)
 print("Робот приступил к рабству...")
-chunks = messageK
+messageK = tonumber(messageK)
 
 
 local chunks = messageK -- количество чанков для добычи
-print(chunks)
 local min, max = 2.2, 40 -- минимальная и максимальная плотность
 local port = 1339 -- порт для взаимодействия с роботом
 local X, Y, Z, D, border = 0, 0, 0, 0 -- переменные локальной системы координат
@@ -92,11 +90,11 @@ check = function(forcibly) -- проверка инструмента, бата�
     local delta = math.abs(X)+math.abs(Y)+math.abs(Z)+64 -- определить расстояние
     local cx, cy, cz = X, Y, Z -- сохранить текущие координаты
     if robot.durability()/W_R < delta then -- если инструмент изношен
-      report('tool is worn')
+      report('ВНИМАНИЕ:Инструмент сильно изношен')
       home(true) -- отправиться домой
     end
     if delta*E_C > computer.energy() then -- проверка уровня энергии
-      report('battery is low')
+      report('ВНИМАНИЕ:Малый запас энергии')
       home(true) -- отправиться домой
     end
     go(cx, cy, cz) -- вернуться на место
@@ -135,7 +133,7 @@ end
 step = function(side) -- функция движения на 1 блок
   if not robot.swing(side) and robot.detect(side) then -- если блок нельзя разрушить
     home(true) -- запустить завершающую функцию
-    report('insurmountable obstacle', true) -- послать сообщение
+    report('ВНИМАНИЕ:Обнаружено препядствие', true) -- послать сообщение
   else
     while robot.swing(side) do end -- копать пока возможно
   end
@@ -226,13 +224,13 @@ end
 
 calibration = function() -- калибровка при запуске
   if not controller then -- проверить наличие контроллера инвентаря
-    report('inventory controller not detected', true)
+    report('Не найден модуль: Inventory controller', true)
   elseif not geolyzer then -- проверить наличие геосканера
-    report('geolyzer not detected', true)
+    report('Не найден модуль: Geolyzer', true)
   elseif not robot.detect(0) then
-    report('bottom solid block is not detected', true)
+    report('ВНИМАНИЕ: Отсутсвует твердый блок под роботом', true)
   elseif not robot.durability() then
-    report('there is no suitable tool in the manipulator', true)
+    report('ВНИМАНИЕ: Отсутсвует инструмент', true)
   end
   if chunkloader then -- если есть чанклоадер
     chunkloader.setActive(true) -- включить
@@ -277,7 +275,7 @@ calibration = function() -- калибровка при запуске
     end
   end
   if not D then
-    report('calibration error', true)
+    report('ВНИМАНИЕ: Ошибка калибровки', true)
   end
 end
 
@@ -389,7 +387,7 @@ sorter = function(pack) -- сортировка лута
 end
 
 home = function(forcibly) -- переход к начальной точке и сброс лута
-  report('ore unloading')
+  report('ИНФО:Выгруз содержимого...')
   local enderchest -- обнулить слот с эндерсундуком
   for slot = 1, inventory do -- просканировать инвентарь
     local item = controller.getStackInInternalSlot(slot) -- получить информацию о слоте
@@ -420,7 +418,7 @@ home = function(forcibly) -- переход к начальной точке и 
       turn() -- повернуться
     end
     if not size or size<26 then -- если контейнер не найден
-      report('container not found') -- послать сообщение
+      report('ВНИМАНИЕ:Не найден сундук') -- послать сообщение
       sleep(30)
     else
       break -- продолжить работу
@@ -473,7 +471,7 @@ home = function(forcibly) -- переход к начальной точке и 
     end
   end
   if forcibly then
-    report('tool search in container')
+    report('ИНФО:Инструмент перемещен в сундук')
     if robot.durability() < 0.3 then -- если прочность инструмента меньше 30%
       robot.select(1) -- выбрать первый слот
       controller.equip() -- поместить инструмент в инвентарь
@@ -490,7 +488,7 @@ home = function(forcibly) -- переход к начальной точке и 
       end
       controller.equip() -- экипировать
     end
-    report('attempt to repair tool')
+    report('ИНФО:Попытка заменить инструмент')
     if robot.durability() < 0.3 then -- если инструмент не заменился на лучший
       for side = 1, 3 do -- перебрать все стороны
         local name = controller.getInventoryName(3) -- получить имя инвенторя
@@ -509,21 +507,21 @@ home = function(forcibly) -- переход к начальной точке и 
                   controller.equip() -- экипировать
                   break -- остановить зарядку
                 else
-                  report('tool is '..math.floor((n_charge+1)/max_charge*100)..'% charged')
+                  report('ИНФО:Робот заряжен на '..math.floor((n_charge+1)/max_charge*100)..'% ')
                 end
               else -- если инструмент не чинится
-                report('tool could not be charged', true) -- остановить работу
+                report('ВНИМАНИЕ:Инструмент не может быть заменен', true) -- остановить работу
               end
             end
           else
-            report('tool could not be repaired', true) -- остановить работу
+            report('ВНИМАНИЕ:Инструмент не может быть заменен', true) -- остановить работу
           end
         else
           turn() -- повернуться
         end
       end
       while robot.durability() < 0.3 do
-        report('need a new tool')
+        report('ВНИМАНИЕ:Нужно заменить инструмент')
         sleep(30)
       end
     end
@@ -532,11 +530,11 @@ home = function(forcibly) -- переход к начальной точке и 
     robot.swing(3) -- забрать сундук
   else
     while computer.energy()/computer.maxEnergy() < 0.98 do -- ждать полного заряда батареи
-      report('charging: '..math.floor((computer.energy()/computer.maxEnergy())*100)..'%')
+      report('ИНФО:Заряд: '..math.floor((computer.energy()/computer.maxEnergy())*100)..'%')
       sleep(30)
     end
   end
-  report('return to work')
+  report('ИНФО:Возвращение к рабству')
 end
 
 main = function()
@@ -585,11 +583,11 @@ for o = 1, 10 do -- цикл ограничения спирали
   for i = 1, 2 do -- цикл обновления координат
     for a = 1, o do -- цикл перехода по линии спирали
       main() -- запуск функции сканирования и добычи
-      report('chunk #'..pos[3]+1 ..' processed') -- сообщить о завершении работы в чанке
+      report('ИНФО:Чанк #'..pos[3]+1 ..' обработан') -- сообщить о завершении работы в чанке
       pos[i], pos[3] = pos[i] + pos[0], pos[3] + 1 -- обновить координаты
       if pos[3] == chunks then -- если достигнут последний чанк
         home(true) -- возврат домой
-        report(computer.uptime()-Tau..' seconds\npath length: '..steps..'\nmade turns: '..turns, true) -- сообщить о завершении работы
+        report(computer.uptime()-Tau..' Секунд\nДлина патча: '..steps..'\nСделано поворотов: '..turns, true) -- сообщить о завершении работы
       else -- иначе
         go(pos[1]*16, -2, pos[2]*16) -- перейти к следующему чанку
         go(X, 0, Z) -- перейти в стартовую точку сканирования
