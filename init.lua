@@ -1,9 +1,11 @@
-local component = require('component') -- подгрузить обертку из OpenOS
-local computer = require('computer')
+--local component = require('component') -- подгрузить обертку из OpenOS
+--local computer = require('computer')
+
+msg,receiverAddress,senderAddress,port,distance,message = event.pull("modem_message")
+		print(message)
 
 
-
-local chunks = 1 -- количество чанков для добычи
+local chunks = 2 -- количество чанков для добычи
 local min, max = 2.2, 40 -- минимальная и максимальная плотность
 local port = 1 -- порт для взаимодействия с роботом
 local X, Y, Z, D, border = 0, 0, 0, 0 -- переменные локальной системы координат
