@@ -472,7 +472,7 @@ home = function(forcibly) -- переход к начальной точке и 
     end
   end
   if forcibly then
-    report('ИНФО:Инструмент перемещен в сундук')
+    report('ИНФО:Ресурсы отправлены в сундук')
     if robot.durability() < 0.3 then -- если прочность инструмента меньше 30%
       robot.select(1) -- выбрать первый слот
       controller.equip() -- поместить инструмент в инвентарь
