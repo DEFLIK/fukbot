@@ -1,5 +1,6 @@
 --local component = require('component') -- подгрузить обертку из OpenOS
 --local computer = require('computer')
+local event = require("event")
 
 msg,receiverAddress,senderAddress,port,distance,message = event.pull("modem_message")
 		print(message)
