@@ -12,9 +12,11 @@ print("Кол-во чанков: ", messageK)
 print("Получено от: ", senderAddress)
 print("Дистанция отправки: ", distance)
 print("Робот приступил к рабству...")
+chunks = messageK
 
 
 local chunks = messageK -- количество чанков для добычи
+print(chunks)
 local min, max = 2.2, 40 -- минимальная и максимальная плотность
 local port = 1339 -- порт для взаимодействия с роботом
 local X, Y, Z, D, border = 0, 0, 0, 0 -- переменные локальной системы координат
