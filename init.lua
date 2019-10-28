@@ -12,6 +12,7 @@ print("Получено от: ", senderAddress)
 print("Дистанция отправки: ", distance)
 print("Робот приступил к рабству...")
 messageK = tonumber(messageK)
+computer.beep('...')
 
 
 local chunks = messageK -- количество чанков для добычи
