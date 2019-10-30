@@ -2,17 +2,22 @@ local component = require('component') -- подгрузить обертку и
 local computer = require('computer')
 local event = require("event")
 component.modem.open(1339)
+print("----------------------------------------------------------------------")
 print("Bot Yanni | by 4sv DEFLIK :)")
 print("Порт связи: 1339")
 print("Ожидаем конфигурации с главного компьютера...")
+print("----------------------------------------------------------------------")
 msg,receiverAddress,senderAddress,port,distance,messageK = event.pull("modem_message")
 print(">Конфигурация получена<")
 print("Кол-во чанков: ", messageK)
 print("Получено от: ", senderAddress)
 print("Дистанция отправки: ", distance)
 print("Робот приступил к рабству...")
+print("----------------------------------------------------------------------")
 messageK = tonumber(messageK)
 computer.beep('...')
+
+
 
 
 local chunks = messageK -- количество чанков для добычи
@@ -56,6 +61,11 @@ local modem = add_component('modem')
 local robot = add_component('robot')
 local inventory = robot.inventorySize()
 local sleep, report, remove_point, check, step, turn, smart_turn, go, scan, calibration, sorter, home, main
+
+local function gohome(msg123,receiverAddress123,senderAddress123,port123,distance123,message123)
+  if message123 == "pcgohome1239" then home(true) end
+end
+event.listen("modem_message", gohome)
 
 sleep = function(timeout)
   local deadline = computer.uptime()+timeout
