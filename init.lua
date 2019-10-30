@@ -2,23 +2,20 @@ local component = require('component') -- подгрузить обертку и
 local computer = require('computer')
 local event = require("event")
 component.modem.open(1339)
-print("----------------------------------------------------------------------")
+print("------------------------------")
 print("Bot Yanni | by 4sv DEFLIK :)")
 print("Порт связи: 1339")
 print("Ожидаем конфигурации с главного компьютера...")
-print("----------------------------------------------------------------------")
+print("------------------------------")
 msg,receiverAddress,senderAddress,port,distance,messageK = event.pull("modem_message")
 print(">Конфигурация получена<")
 print("Кол-во чанков: ", messageK)
 print("Получено от: ", senderAddress)
 print("Дистанция отправки: ", distance)
 print("Робот приступил к рабству...")
-print("----------------------------------------------------------------------")
+print("------------------------------")
 messageK = tonumber(messageK)
 computer.beep('...')
-
-
-
 
 local chunks = messageK -- количество чанков для добычи
 local min, max = 2.2, 40 -- минимальная и максимальная плотность
