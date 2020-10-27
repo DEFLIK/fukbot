@@ -25,6 +25,8 @@ local steps, turns = 0, 0 -- debug
 local WORLD = {x = {}, y = {}, z = {}} -- таблица меток
 local E_C, W_R = 0, 0 -- энергозатраты на один шаг и скорость износа
 
+--event.listen("modem_message", gohome)
+
 local function arr2a_arr(tbl) -- преобразование списка в ассоциативный массив
   for i = #tbl, 1, -1 do
    tbl[tbl[i]], tbl[i] = true, nil
@@ -60,9 +62,9 @@ local inventory = robot.inventorySize()
 local sleep, report, remove_point, check, step, turn, smart_turn, go, scan, calibration, sorter, home, main
 
 local function gohome(msg123,receiverAddress123,senderAddress123,port123,distance123,message123)
-  if message123 == "pcgohome1239" then home(true) report('ИНФО:Робот получил принудительный возврат!', true) end
+  if message123 == "pcgohome1239" then home(truereport('ИНФО:Робот получил принудительный возврат!', true) end
 end
-event.listen("modem_message", gohome)
+--event.listen("modem_message", gohome)
 
 sleep = function(timeout)
   local deadline = computer.uptime()+timeout
@@ -94,6 +96,7 @@ remove_point = function(point) -- удаление меток
 end
 
 check = function(forcibly) -- проверка инструмента, батареи, удаление меток
+  event.listen("modem_message", gohome)
   if steps%32 == 0 or forcibly then -- если пройдено 32 шага или включен принудительный режим
     local delta = math.abs(X)+math.abs(Y)+math.abs(Z)+64 -- определить расстояние
     local cx, cy, cz = X, Y, Z -- сохранить текущие координаты
