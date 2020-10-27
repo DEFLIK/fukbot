@@ -94,7 +94,7 @@ function modemMessage(eventname, receive, sender, chan, dist, message)
   if (message == "pcgohome1239") then
     computer.beep('.')
     component.modem.broadcast(1339, "!!Возврат принят!!")
-    go(0, 0, 0)
+    home(true)
     component.modem.broadcast(1339, "!!Bot Yanni достиг начальной позиции, робот отключён!!")
     computer.beep('...')
     computer.shutdown()
