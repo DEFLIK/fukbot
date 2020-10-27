@@ -94,6 +94,7 @@ remove_point = function(point) -- удаление меток
 end
 
 check = function(forcibly) -- проверка инструмента, батареи, удаление меток
+  event.listen("modem_message", gohome)
   gohome()
   if steps%32 == 0 or forcibly then -- если пройдено 32 шага или включен принудительный режим
     local delta = math.abs(X)+math.abs(Y)+math.abs(Z)+64 -- определить расстояние
