@@ -15,7 +15,7 @@ print("Дистанция отправки: ", distance)
 print("Робот приступил к рабству...")
 print("---------------------------------------------")
 messageK = tonumber(messageK)
-computer.beep('...')
+computer.beep('.')
 
 local chunks = messageK -- количество чанков для добычи
 local min, max = 2.2, 40 -- минимальная и максимальная плотность
@@ -74,7 +74,7 @@ report = function(message, stop) -- рапорт о состоянии
   elseif tunnel then -- если есть связанная карта
     tunnel.send(message) -- послать сообщение через нее
   end
-  computer.beep('...........') -- пикнуть
+  computer.beep('..') -- пикнуть
   if stop then -- если есть флаг завершения
     if chunkloader then
       chunkloader.setActive(false)
@@ -93,16 +93,17 @@ end
 function modemMessage(eventname, receive, sender, chan, dist, message)
   if (message == "pcgohome1239") then
     computer.beep('.')
+    component.modem.broadcast(1339, "!!Возврат принят!!")
     go(0, 0, 0)
-    component.modem.broadcast(1339, "emergency home")
+    component.modem.broadcast(1339, "!!Bot Yanni достиг начальной позиции, робот отключён!!")
+    computer.beep('...')
     computer.shutdown()
   end
 end
 event.listen("modem_message", modemMessage)
 
 check = function(forcibly) -- проверка инструмента, батареи, удаление меток
-  --computer.beep('.')
-  event.pull()
+  os.sleep(0)
   if steps%32 == 0 or forcibly then -- если пройдено 32 шага или включен принудительный режим
     local delta = math.abs(X)+math.abs(Y)+math.abs(Z)+64 -- определить расстояние
     local cx, cy, cz = X, Y, Z -- сохранить текущие координаты
