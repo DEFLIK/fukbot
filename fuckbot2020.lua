@@ -47,6 +47,7 @@ local function add_component(name) -- получение прокси компо
   end
 end
 
+
 -- загрузка компонентов --
 local controller = add_component('inventory_controller')
 local chunkloader = add_component('chunkloader')
