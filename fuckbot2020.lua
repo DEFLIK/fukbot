@@ -90,7 +90,7 @@ end
 
 
 function modemMessage(eventname, receive, sender, chan, dist, message)
-  if (message == "pcgohome1239")
+  if (message == "pcgohome1239") then
     computer.beep('.')
     home(true)
   end
