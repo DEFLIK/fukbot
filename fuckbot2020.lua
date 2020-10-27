@@ -47,7 +47,6 @@ local function add_component(name) -- получение прокси компо
   end
 end
 
-
 -- загрузка компонентов --
 local controller = add_component('inventory_controller')
 local chunkloader = add_component('chunkloader')
@@ -58,7 +57,7 @@ local tunnel = add_component('tunnel')
 local modem = add_component('modem')
 local robot = add_component('robot')
 local inventory = robot.inventorySize()
-local sleep, report, remove_point, check, step, turn, smart_turn, go, scan, calibration, sorter, home, main
+local sleep, report, remove_point, check, step, turn, smart_turn, go, scan, calibration, sorter, home, main, modemMessage
 
 sleep = function(timeout)
   local deadline = computer.uptime()+timeout
@@ -98,11 +97,11 @@ end
 check = function(forcibly) -- проверка инструмента, батареи, удаление меток
   computer.beep('.')
   print("check")
-  local function modemMessage(eventname, receive, sender, chan, dist, message)
+  event.pull(name)
+  if name == "modem_message" then
     computer.beep('.')
-    print(message)
+    home(true)
   end
-  event.listen("modem_message", modemMessage)
   if steps%32 == 0 or forcibly then -- если пройдено 32 шага или включен принудительный режим
     local delta = math.abs(X)+math.abs(Y)+math.abs(Z)+64 -- определить расстояние
     local cx, cy, cz = X, Y, Z -- сохранить текущие координаты
