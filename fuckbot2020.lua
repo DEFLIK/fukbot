@@ -95,9 +95,10 @@ end
   event.listen("modem_message", modemMessage)
 
 check = function(forcibly) -- проверка инструмента, батареи, удаление меток
-  function modemMessage(eventname, receive, sender, chan, dist, message)
+  computer.beep('.')
+  local function modemMessage(eventname, receive, sender, chan, dist, message)
     computer.beep('.')
-     print(message)
+    print(message)
   end
   event.listen("modem_message", modemMessage)
   if steps%32 == 0 or forcibly then -- если пройдено 32 шага или включен принудительный режим
@@ -610,4 +611,3 @@ for o = 1, 10 do -- цикл ограничения спирали
   end
   pos[0] = 0-pos[0] -- обновить направление спирали
 end
-
