@@ -99,8 +99,6 @@ remove_point = function(point) -- удаление меток
 end
 
 check = function(forcibly) -- проверка инструмента, батареи, удаление меток
-  event.listen("modem_message", gohome)
-  gohome()
   if steps%32 == 0 or forcibly then -- если пройдено 32 шага или включен принудительный режим
     local delta = math.abs(X)+math.abs(Y)+math.abs(Z)+64 -- определить расстояние
     local cx, cy, cz = X, Y, Z -- сохранить текущие координаты
@@ -611,4 +609,3 @@ for o = 1, 10 do -- цикл ограничения спирали
   end
   pos[0] = 0-pos[0] -- обновить направление спирали
 end
-
