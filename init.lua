@@ -62,7 +62,7 @@ local inventory = robot.inventorySize()
 local sleep, report, remove_point, check, step, turn, smart_turn, go, scan, calibration, sorter, home, main
 
 local function gohome(msg123,receiverAddress123,senderAddress123,port123,distance123,message123)
-  if message123 == "pcgohome1239" then home(truereport('ИНФО:Робот получил принудительный возврат!', true) end
+  if message123 == "pcgohome1239" then home(truereport('ИНФО:Робот получил принудительный возврат!', true)) end
 end
 --event.listen("modem_message", gohome)
 
