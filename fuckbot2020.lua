@@ -63,7 +63,7 @@ local function gohome(msg123,receiverAddress123,senderAddress123,port123,distanc
   print("text:")
   print(message123)
   print("poop:")
-  print(msg12)
+  print(msg123)
   computer.beep('.')
   if message123 == "pcgohome1239" then home(truereport('ИНФО:Робот получил принудительный возврат!', true)) end
 end
