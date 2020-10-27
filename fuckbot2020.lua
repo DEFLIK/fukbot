@@ -46,6 +46,7 @@ local function add_component(name) -- получение прокси компо
     return component.proxy(name) -- вернуть прокси
   end
 end
+
 -- загрузка компонентов --
 local controller = add_component('inventory_controller')
 local chunkloader = add_component('chunkloader')
@@ -87,17 +88,20 @@ remove_point = function(point) -- удаление меток
   table.remove(WORLD.z, point)
 end
 
+
 function modemMessage(eventname, receive, sender, chan, dist, message)
-  computer.beep('.')
-  print(message)
-  home(true)
-end
+  if (message == "pcgohome1239")
+    computer.beep('.')
+    home(true)
+  end
+  event.ignore("modem_message", modemMessage)
   event.listen("modem_message", modemMessage)
+end
+event.listen("modem_message", modemMessage)
 
 check = function(forcibly) -- проверка инструмента, батареи, удаление меток
-  computer.beep('.')
-  print("check")
-
+  --computer.beep('.')
+  modemMessage()
   if steps%32 == 0 or forcibly then -- если пройдено 32 шага или включен принудительный режим
     local delta = math.abs(X)+math.abs(Y)+math.abs(Z)+64 -- определить расстояние
     local cx, cy, cz = X, Y, Z -- сохранить текущие координаты
@@ -143,7 +147,7 @@ check = function(forcibly) -- проверка инструмента, бата�
 end
 
 step = function(side) -- функция движения на 1 блок
-  print("step")
+  --print("step")
   if not robot.swing(side) and robot.detect(side) then -- если блок нельзя разрушить
     home(true) -- запустить завершающую функцию
     report('ВНИМАНИЕ:Обнаружено препядствие', true) -- послать сообщение
@@ -172,7 +176,7 @@ step = function(side) -- функция движения на 1 блок
 end
 
 turn = function(side) -- поворот в сторону
-  print("turn")
+  --print("turn")
   side = side or false
   if robot.turn(side) and D then -- если робот повернулся, обновить переменную  направления
     turns = turns+1 -- debug
@@ -186,14 +190,14 @@ turn = function(side) -- поворот в сторону
 end
 
 smart_turn = function(side) -- поворот в определенную сторону света
-  print("smartturn")
+  --print("smartturn")
   while D ~= side do
     turn((side-D)%4==1)
   end
 end
 
 go = function(x, y, z) -- переход по указанным координатам
-  print("go")
+  --print("go")
   if border and y < border then
     y = border
   end
@@ -223,7 +227,7 @@ go = function(x, y, z) -- переход по указанным координ�
 end
 
 scan = function(xx, zz) -- сканирование квадрата x8 относительно робота
-  print("scan")
+  --print("scan")
   local raw, index = geolyzer.scan(xx, zz, -1, 8, 8, 1), 1 -- получить сырые данные, установить индекс в начало таблицы
   for z = zz, zz+7 do -- развертка данных по z
     for x = xx, xx+7 do -- развертка данных по х
@@ -240,7 +244,7 @@ scan = function(xx, zz) -- сканирование квадрата x8 отно
 end
 
 calibration = function() -- калибровка при запуске
-  print("calib")
+  --print("calib")
   if not controller then -- проверить наличие контроллера инвентаря
     report('Не найден модуль: Inventory controller', true)
   elseif not geolyzer then -- проверить наличие геосканера
@@ -298,7 +302,7 @@ calibration = function() -- калибровка при запуске
 end
 
 sorter = function(pack) -- сортировка лута
-  print("sort")
+  --print("sort")
   robot.swing(0) -- освободить место для мусора
   robot.swing(1) -- освободить место для буфера
   ------- сброс мусора -------
@@ -406,7 +410,7 @@ sorter = function(pack) -- сортировка лута
 end
 
 home = function(forcibly) -- переход к начальной точке и сброс лута
-  print("home")
+  --print("home")
   report('ИНФО:Выгруз содержимого...')
   local enderchest -- обнулить слот с эндерсундуком
   for slot = 1, inventory do -- просканировать инвентарь
@@ -558,7 +562,7 @@ home = function(forcibly) -- переход к начальной точке и 
 end
 
 main = function()
-  print("main")
+  --print("main")
   border = nil
   while not border do
     step(0)
