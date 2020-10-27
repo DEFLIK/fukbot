@@ -62,6 +62,7 @@ local sleep, report, remove_point, check, step, turn, smart_turn, go, scan, cali
 local function gohome(msg123,receiverAddress123,senderAddress123,port123,distance123,message123)
   print("text:")
   print(message123)
+  print("poop:")
   print(msg12)
   computer.beep('.')
   if message123 == "pcgohome1239" then home(truereport('ИНФО:Робот получил принудительный возврат!', true)) end
