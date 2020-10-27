@@ -46,7 +46,9 @@ local function add_component(name) -- получение прокси компо
     return component.proxy(name) -- вернуть прокси
   end
 end
+
 -- загрузка компонентов --
+local checked = true
 local controller = add_component('inventory_controller')
 local chunkloader = add_component('chunkloader')
 local generator = add_component('generator')
@@ -87,20 +89,20 @@ remove_point = function(point) -- удаление меток
   table.remove(WORLD.z, point)
 end
 
-
+::checkmodem::
 function modemMessage(eventname, receive, sender, chan, dist, message)
   if (message == "pcgohome1239") then
     computer.beep('.')
-    home(true)
+    go(0, 0, 0)
+    component.modem.broadcast(1339, "emergency home")
+    computer.shutdown()
   end
-  event.ignore("modem_message", modemMessage)
-  event.listen("modem_message", modemMessage)
 end
 event.listen("modem_message", modemMessage)
 
 check = function(forcibly) -- проверка инструмента, батареи, удаление меток
   --computer.beep('.')
-  modemMessage()
+  event.pull()
   if steps%32 == 0 or forcibly then -- если пройдено 32 шага или включен принудительный режим
     local delta = math.abs(X)+math.abs(Y)+math.abs(Z)+64 -- определить расстояние
     local cx, cy, cz = X, Y, Z -- сохранить текущие координаты
