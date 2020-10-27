@@ -92,9 +92,11 @@ function modemMessage(eventname, receive, sender, chan, dist, message)
   computer.beep('.')
    print(message)
 end
-event.listen("modem_message", modemMessage)
+  event.listen("modem_message", modemMessage)
 
 check = function(forcibly) -- проверка инструмента, батареи, удаление меток
+  event.ignore("modem_message", modemMessage)
+  event.listen("modem_message", modemMessage)
   if steps%32 == 0 or forcibly then -- если пройдено 32 шага или включен принудительный режим
     local delta = math.abs(X)+math.abs(Y)+math.abs(Z)+64 -- определить расстояние
     local cx, cy, cz = X, Y, Z -- сохранить текущие координаты
@@ -605,4 +607,3 @@ for o = 1, 10 do -- цикл ограничения спирали
   end
   pos[0] = 0-pos[0] -- обновить направление спирали
 end
-
