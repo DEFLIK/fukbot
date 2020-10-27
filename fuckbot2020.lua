@@ -59,16 +59,6 @@ local robot = add_component('robot')
 local inventory = robot.inventorySize()
 local sleep, report, remove_point, check, step, turn, smart_turn, go, scan, calibration, sorter, home, main
 
-local function gohome(msg123,receiverAddress123,senderAddress123,port123,distance123,message123)
-  print("text:")
-  print(message123)
-  print("poop:")
-  print(msg123)
-  computer.beep('.')
-  if message123 == "pcgohome1239" then home(truereport('ИНФО:Робот получил принудительный возврат!', true)) end
-end
-event.listen("modem_message", gohome)
-
 sleep = function(timeout)
   local deadline = computer.uptime()+timeout
   repeat
@@ -97,6 +87,12 @@ remove_point = function(point) -- удаление меток
   table.remove(WORLD.y, point)
   table.remove(WORLD.z, point)
 end
+
+function modemMessage(eventname, receive, sender, chan, dist, message)
+  computer.beep('.')
+   print(message)
+end
+event.listen("modem_message", modemMessage)
 
 check = function(forcibly) -- проверка инструмента, батареи, удаление меток
   if steps%32 == 0 or forcibly then -- если пройдено 32 шага или включен принудительный режим
