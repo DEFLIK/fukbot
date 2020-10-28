@@ -596,7 +596,7 @@ main = function()
         c_delta, current = n_delta, index
       end
     end
-    if doneScan then
+    if doneScan == false then
       blockSummary = progress
       doneScan = true
     end
