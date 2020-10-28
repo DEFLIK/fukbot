@@ -9,6 +9,12 @@ print("Порт связи: "..port)
 print("Ожидаем конфигурации с главного компьютера...")
 print("---------------------------------------------")
 msg,receiverAddress,senderAddress,port,distance,messageK = event.pull("modem_message")
+print(">Конфигурация получена<")
+print("Кол-во чанков: ", messageK)
+print("Получено от: ", senderAddress)
+print("Дистанция отправки: ", distance)
+print("Робот приступил к рабству...")
+print("---------------------------------------------")
 messageK = tonumber(messageK)
 computer.beep('.')
 
@@ -85,12 +91,8 @@ remove_point = function(point) -- удаление меток
   table.remove(WORLD.z, point)
 end
 
-report("INFO: >Конфигурация получена<")
-report("INFO: Кол-во чанков: "..messageK)
-report("INFO: Получено от: "..senderAddress)
-report("INFO: Дистанция отправки: "..distance)
-report("INFO: Робот приступил к рабству...")
-report("INFO ---------------------------------------------")
+report("INFO: Связь установлена! Бот приступил к рабству")
+report("INFO: Кол-во чанков: "..messageK.."Дистанция отправки:"..distance..)
 
 function modemMessage(eventname, receive, sender, chan, dist, message)
   if (message == "pcgohome1239") then
@@ -625,4 +627,3 @@ for o = 1, 10 do -- цикл ограничения спирали
   end
   pos[0] = 0-pos[0] -- обновить направление спирали
 end
-
