@@ -46,6 +46,7 @@ local function add_component(name) -- получение прокси компо
     return component.proxy(name) -- вернуть прокси
   end
 end
+
 -- загрузка компонентов --
 local checked = true
 local controller = add_component('inventory_controller')
