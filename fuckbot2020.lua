@@ -25,6 +25,8 @@ local steps, turns = 0, 0 -- debug
 local WORLD = {x = {}, y = {}, z = {}} -- таблица меток
 local E_C, W_R = 0, 0 -- энергозатраты на один шаг и скорость износа
 local progress = 0
+local doneScan = false
+local blockSummary = 0
 
 local function arr2a_arr(tbl) -- преобразование списка в ассоциативный массив
   for i = #tbl, 1, -1 do
@@ -94,6 +96,7 @@ end
 
 report("INFO: Связь установлена! Бот приступил к рабству")
 report("INFO: Кол-во чанков: "..messageK.." |  Дистанция отправки:"..distance)
+component.modem.broadcast(1339, "prgrs"..0)
 
 function modemMessage(eventname, receive, sender, chan, dist, message)
   if (message == "pcgohome1239") then
@@ -593,6 +596,11 @@ main = function()
         c_delta, current = n_delta, index
       end
     end
+    if doneScan then
+      blockSummary = progress
+      doneScan = true
+    end
+    progress = 100 - (progress / blockSummary * 100)
     component.modem.broadcast(1339, "prgrs"..progress)
     if WORLD.x[current] == X and WORLD.y[current] == Y and WORLD.z[current] == Z then
       remove_point(current)
