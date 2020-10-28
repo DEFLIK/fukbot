@@ -69,6 +69,7 @@ end
 
 report = function(message, stop) -- рапорт о состоянии
   message = '|'..X..' '..Y..' '..Z..'|\n'..message -- добавить к сообщению координаты
+  print(message)
   if modem then -- если есть модем
     modem.broadcast(port, message) -- послать сообщение через модем
   elseif tunnel then -- если есть связанная карта
@@ -614,7 +615,7 @@ for o = 1, 10 do -- цикл ограничения спирали
       pos[i], pos[3] = pos[i] + pos[0], pos[3] + 1 -- обновить координаты
       if pos[3] == chunks then -- если достигнут последний чанк
         home(true) -- возврат домой
-        report(computer.uptime()-Tau..' Секунд\nДлина патча: '..steps..'\nСделано поворотов: '..turns, true) -- сообщить о завершении работы
+        report('DONE:'..computer.uptime()-Tau..' Секунд\nДлина патча: '..steps..'\nСделано поворотов: '..turns, true) -- сообщить о завершении работы
       else -- иначе
         go(pos[1]*16, -2, pos[2]*16) -- перейти к следующему чанку
         go(X, 0, Z) -- перейти в стартовую точку сканирования
