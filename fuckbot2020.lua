@@ -1,26 +1,19 @@
 local component = require('component') -- подгрузить обертку из OpenOS
 local computer = require('computer')
 local event = require("event")
-component.modem.open(1339)
+local port = 1339 -- порт для взаимодействия с роботом
+component.modem.open(port)
 print("---------------------------------------------")
 print("Bot Yanni | by 4sv DEFLIK :)")
-print("Порт связи: 1339")
+print("Порт связи: "..port)
 print("Ожидаем конфигурации с главного компьютера...")
 print("---------------------------------------------")
 msg,receiverAddress,senderAddress,port,distance,messageK = event.pull("modem_message")
-print(">Конфигурация получена<")
-print("Кол-во чанков: ", messageK)
-print("Получено от: ", senderAddress)
-print("Дистанция отправки: ", distance)
-print("Робот приступил к рабству...")
-print("---------------------------------------------")
 messageK = tonumber(messageK)
 computer.beep('.')
-report("INFO: Связь установлена! Бот приступил к рабству")
 
 local chunks = messageK -- количество чанков для добычи
 local min, max = 2.2, 40 -- минимальная и максимальная плотность
-local port = 1339 -- порт для взаимодействия с роботом
 local X, Y, Z, D, border = 0, 0, 0, 0 -- переменные локальной системы координат
 local steps, turns = 0, 0 -- debug
 local WORLD = {x = {}, y = {}, z = {}} -- таблица меток
@@ -92,13 +85,19 @@ remove_point = function(point) -- удаление меток
   table.remove(WORLD.z, point)
 end
 
-::checkmodem::
+report("INFO: >Конфигурация получена<")
+report("INFO: Кол-во чанков: "..messageK)
+report("INFO: Получено от: "..senderAddress)
+report("INFO: Дистанция отправки: "..distance)
+report("INFO: Робот приступил к рабству...")
+report("INFO ---------------------------------------------")
+
 function modemMessage(eventname, receive, sender, chan, dist, message)
   if (message == "pcgohome1239") then
     computer.beep('.')
-    component.modem.broadcast(1339, "!!Возврат принят!!")
+    component.modem.broadcast(port, "!!Возврат принят!!")
     home(true)
-    component.modem.broadcast(1339, "!!Bot Yanni достиг начальной позиции, робот отключён!!")
+    component.modem.broadcast(port, "!!Bot Yanni достиг начальной позиции, робот отключён!!")
     computer.beep('...')
     computer.shutdown()
   end
