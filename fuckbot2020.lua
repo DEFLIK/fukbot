@@ -601,6 +601,7 @@ main = function()
       doneScan = true
     end
     progress = 100 - (progress / blockSummary * 100)
+    print(progress)
     component.modem.broadcast(1339, "prgrs"..progress)
     if WORLD.x[current] == X and WORLD.y[current] == Y and WORLD.z[current] == Z then
       remove_point(current)
