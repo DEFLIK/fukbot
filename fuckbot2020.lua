@@ -24,6 +24,7 @@ local X, Y, Z, D, border = 0, 0, 0, 0 -- переменные локальной
 local steps, turns = 0, 0 -- debug
 local WORLD = {x = {}, y = {}, z = {}} -- таблица меток
 local E_C, W_R = 0, 0 -- энергозатраты на один шаг и скорость износа
+local progress = 0
 
 local function arr2a_arr(tbl) -- преобразование списка в ассоциативный массив
   for i = #tbl, 1, -1 do
@@ -92,7 +93,7 @@ remove_point = function(point) -- удаление меток
 end
 
 report("INFO: Связь установлена! Бот приступил к рабству")
-report("INFO: Кол-во чанков: "..messageK.."|  Дистанция отправки:"..distance)
+report("INFO: Кол-во чанков: "..messageK.." |  Дистанция отправки:"..distance)
 
 function modemMessage(eventname, receive, sender, chan, dist, message)
   if (message == "pcgohome1239") then
@@ -580,7 +581,7 @@ main = function()
   while #WORLD.x ~= 0 do
     local n_delta, c_delta, current = math.huge, math.huge
     for index = 1, #WORLD.x do
-      print("слой обработан")
+      progress = progress + 1
       n_delta = math.abs(X-WORLD.x[index])+math.abs(Y-WORLD.y[index])+math.abs(Z-WORLD.z[index])-border+WORLD.y[index]
       if (WORLD.x[index] > X and D ~= 3) or
       (WORLD.x[index] < X and D ~= 1) or
@@ -592,6 +593,7 @@ main = function()
         c_delta, current = n_delta, index
       end
     end
+    component.modem.broadcast(1339, "prgrs"..progress)
     if WORLD.x[current] == X and WORLD.y[current] == Y and WORLD.z[current] == Z then
       remove_point(current)
     else
