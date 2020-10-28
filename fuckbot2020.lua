@@ -92,14 +92,14 @@ remove_point = function(point) -- удаление меток
 end
 
 report("INFO: Связь установлена! Бот приступил к рабству")
-report("INFO: Кол-во чанков: "..messageK.."Дистанция отправки:"..distance..)
+report("INFO: Кол-во чанков: "..messageK.."|  Дистанция отправки:"..distance)
 
 function modemMessage(eventname, receive, sender, chan, dist, message)
   if (message == "pcgohome1239") then
     computer.beep('.')
-    component.modem.broadcast(port, "!!Возврат принят!!")
+    component.modem.broadcast(port, ">Возврат принят<")
     home(true)
-    component.modem.broadcast(port, "!!Bot Yanni достиг начальной позиции, робот отключён!!")
+    component.modem.broadcast(port, ">Bot Yanni достиг начальной позиции, робот отключён<")
     computer.beep('...')
     computer.shutdown()
   end
@@ -580,6 +580,7 @@ main = function()
   while #WORLD.x ~= 0 do
     local n_delta, c_delta, current = math.huge, math.huge
     for index = 1, #WORLD.x do
+      print("слой обработан")
       n_delta = math.abs(X-WORLD.x[index])+math.abs(Y-WORLD.y[index])+math.abs(Z-WORLD.z[index])-border+WORLD.y[index]
       if (WORLD.x[index] > X and D ~= 3) or
       (WORLD.x[index] < X and D ~= 1) or
