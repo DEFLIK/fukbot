@@ -105,7 +105,7 @@ end
 report("INFO: Связь установлена! Бот приступил к рабству")
 report("INFO: Кол-во чанков: "..messageK.." |  Дистанция отправки:"..distance)
 component.modem.broadcast(port, "prgrs"..0)
-component.modem.broadcast(port, "bttry"..(computer.energy() / computer.maxEnergy()))
+component.modem.broadcast(port, "bttry"..(math.floor(computer.energy() / computer.maxEnergy())))
 
 function modemMessage(eventname, receive, sender, chan, dist, message)
   if (message == "pcgohome1239") then
