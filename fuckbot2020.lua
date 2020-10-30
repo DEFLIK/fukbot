@@ -105,7 +105,7 @@ end
 report("INFO: Связь установлена! Бот приступил к рабству")
 report("INFO: Кол-во чанков: "..messageK.." |  Дистанция отправки:"..distance)
 component.modem.broadcast(port, "prgrs"..0)
-component.modem.broadcast(port, "bttry"..(math.floor(computer.energy() / computer.maxEnergy() * 100)))
+component.modem.broadcast(port, "bttry"..(math.floor((computer.energy()/computer.maxEnergy())*100)))
 
 function modemMessage(eventname, receive, sender, chan, dist, message)
   if (message == "pcgohome1239") then
@@ -121,7 +121,7 @@ event.listen("modem_message", modemMessage)
 
 check = function(forcibly) -- проверка инструмента, батареи, удаление меток
   os.sleep(0)
-  component.modem.broadcast(port, "bttry"..(math.floor(computer.energy() / computer.maxEnergy() * 100)))
+  component.modem.broadcast(port, "bttry"..(math.floor((computer.energy()/computer.maxEnergy())*100)))
   if steps%32 == 0 or forcibly then -- если пройдено 32 шага или включен принудительный режим
     local delta = math.abs(X)+math.abs(Y)+math.abs(Z)+64 -- определить расстояние
     local cx, cy, cz = X, Y, Z -- сохранить текущие координаты
