@@ -72,13 +72,13 @@ end
 
 report = function(message, stop) -- рапорт о состоянии
   if message:sub(1,1) == "W" then
-    message = 'WARN: |'..X..' '..Y..' '..Z..'|\n'..message:sub(7,string.len(message)) -- добавить к сообщению координаты
+    message = 'WARN |'..X..' '..Y..' '..Z..'|: '..message:sub(7,string.len(message)) -- добавить к сообщению координаты
   end
   if message:sub(1,1) == "I" then
-    message = 'INFO: |'..X..' '..Y..' '..Z..'|\n'..message:sub(7,string.len(message)) -- добавить к сообщению координаты
+    message = 'INFO |'..X..' '..Y..' '..Z..'|: '..message:sub(7,string.len(message)) -- добавить к сообщению координаты
   end
   if message:sub(1,1) == "D" then
-    message = 'DONE: |'..X..' '..Y..' '..Z..'|\n'..message:sub(7,string.len(message)) -- добавить к сообщению координаты
+    message = 'DONE |'..X..' '..Y..' '..Z..'|: '..message:sub(7,string.len(message)) -- добавить к сообщению координаты
   end
   print(message)
   if modem then -- если есть модем
