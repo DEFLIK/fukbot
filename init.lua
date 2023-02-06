@@ -4,7 +4,7 @@ local event = require("event")
 local port = 1339 -- порт для взаимодействия с роботом
 component.modem.open(port)
 print("---------------------------------------------")
-print("Bot Yanni | v0.1.7")
+print("Bot Yanni | v0.1.9")
 print("Порт связи: "..port)
 print("Ожидаем конфигурации с главного компьютера...")
 print("---------------------------------------------")
@@ -625,7 +625,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
       sleep(30)
       local prev_energy = cur_energy;
       local cur_energy = energy_level()
-      if math.floor(prev_energy) >= math.floor(cur_energy) then
+      if math.floor(prev_energy*100) >= math.floor(cur_energy*100) then
         report('WARN: Энергия для заряда не поступает')
         if (cur_energy > 0.15) then
           break
