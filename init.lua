@@ -124,7 +124,7 @@ event.listen("modem_message", modemMessage)
 
 check = function(forcibly) -- проверка инструмента, батареи, удаление меток
   os.sleep(0)
-  component.modem.broadcast(port, "bttry"..(math.floor(energy_level())*100)))
+  component.modem.broadcast(port, "bttry"..(math.floor(energy_level())*100))
   component.modem.broadcast(port, "poss"..'|'..X..' '..Y..' '..Z..'|')
   if not ignore_check and (steps%32 == 0 or forcibly) then -- если пройдено 32 шага или включен принудительный режим
     inv_check()
