@@ -13,12 +13,14 @@ local portLength = 7
 local chunksLength = 15
 local optionsLength = 18
 local batteryValue = 0
+local batteryLength = 15
+local posLength = 15
 local posValue = "| X Y Z |"
 local handle
 local logoText = "|-=Bot Yanni=-|"
 local settingsLength = portLength + chunksLength + optionsLength + 3
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-local workspace, window, menu = system.addWindow(GUI.tabbedWindow(5, 1, 70, 46))
+local workspace, window, menu = system.addWindow(GUI.tabbedWindow(5, 1, 70, 48))
 
 control = window.tabBar:addItem("Control")
 setup = window.tabBar:addItem("Setup")
@@ -37,6 +39,7 @@ setup.onTouch = function()
 		layout2.hidden = false
 end
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 layout:addChild(GUI.text(1, 1, 0x4B4B4B, ""))
 layout:addChild(GUI.text(1, 1, 0x4B4B4B, ""))
 local logo = window:addChild(GUI.text(window.width - string.len(logoText), 2, 0x4B4B4B, logoText))
@@ -58,7 +61,7 @@ layout:addChild(GUI.roundedButton(1, 5, 10, 3, 0xC6C9D3, 0x258922, 0x74777E, 0x1
   computer.beep("..")
   GUI.alert("Конфигурация отправлена!", port.text, math.floor(chunksSlider.value))
 end
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 layout:addChild(GUI.text(1, 1, 0x4B4B4B, "|ПАНЕЛЬ УПРАВЛЕНИЯ|"))
 layout:addChild(GUI.button(1, 1, 24, 3, 0xC6C9D3, 0xBA2020, 0x74777E, 0x123C10, "Принудительный возврат")).onTouch = function()
   component.modem.broadcast(port.text, "pcgohome1239")
@@ -106,15 +109,15 @@ function InfoUpdate(msg13,receiverAddress13,senderAddress13,port13,distance13,me
       batteryValue = tonumber(message13:sub(6,7))
     end
   
-    if message14:sub(1,4) == "poss" then
-      posValue = message14:sub(5,string.len(message14))
+    if message13:sub(1,4) == "poss" then
+      posValue = message13:sub(5,string.len(message13))
     end
 
     local bat = layout:addChild(GUI.text(0, 0, 0x78dbe2, 'Заряд: '..batteryValue..'%'))
     local poss = layout:addChild(GUI.text(0, 0, 0x4B4B4B, posValue))
   end
 end
-event.addHandler(BatteryUpdate)
+event.addHandler(InfoUpdate)
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 local link = "https://raw.githubusercontent.com/DEFLIK/fukbot/master/init.lua"
 local formatText = "Format disk before setup"
