@@ -4,7 +4,7 @@ local event = require("event")
 local port = 1339 -- порт для взаимодействия с роботом
 component.modem.open(port)
 print("---------------------------------------------")
-print("Bot Yanni | v0.1")
+print("Bot Yanni | v0.1.2")
 print("Порт связи: "..port)
 print("Ожидаем конфигурации с главного компьютера...")
 print("---------------------------------------------")
@@ -124,7 +124,8 @@ event.listen("modem_message", modemMessage)
 
 check = function(forcibly) -- проверка инструмента, батареи, удаление меток
   os.sleep(0)
-  component.modem.broadcast(port, "bttry"..(math.floor((computer.energy()/computer.maxEnergy())*100)))
+  component.modem.broadcast(port, "bttry"..(math.floor(energy_level())*100)))
+  component.modem.broadcast(port, "poss"..'|'..X..' '..Y..' '..Z..'|')
   if not ignore_check and (steps%32 == 0 or forcibly) then -- если пройдено 32 шага или включен принудительный режим
     inv_check()
     local delta = math.abs(X)+math.abs(Y)+math.abs(Z)+64 -- определить расстояние
@@ -617,10 +618,10 @@ home = function(forcibly, interrupt) -- переход к начальной т�
   if enderchest and not forcibly then
     robot.swing(3) -- забрать сундук
   else
-    while energy_level() < 0.98 do -- ждать полного заряда батареи
-      report('INFO: Заряд: '..math.floor(energy_level()*100)..'%')
-      sleep(30)
-    end
+--     while energy_level() < 0.98 do -- ждать полного заряда батареи
+--       report('INFO: Заряд: '..math.floor(energy_level()*100)..'%')
+--       sleep(30)
+--     end
   end
   ignore_check = nil
   if not interrupt then
