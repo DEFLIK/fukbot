@@ -109,7 +109,7 @@ local poss = layout:addChild(GUI.text(0, 0, 0x78dbe2, '| X Y Z |'))
 function PositionUpdate(msg14,receiverAddress14,senderAddress14,port14,distance14,message14)
   if msg14 == "modem_message" and port14 == port.text and message14:sub(1,4) == "poss" then
     poss:remove()
-local poss = layout:addChild(GUI.text(0, 0, 0x78dbe2, message14:sub(5,string.len(message14)))
+    local poss = layout:addChild(GUI.text(0, 0, 0x78dbe2, message14:sub(5,string.len(message14))))
   end
 end
 event.addHandler(PositionUpdate)
