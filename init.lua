@@ -625,7 +625,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
       sleep(30)
       local prev_energy = cur_energy;
       local cur_energy = energy_level()
-      if prev_energy == cur_energy then
+      if math.floor(prev_energy) == math.floor(cur_energy) then
         report('WARN: Энергия для заряда не поступает')
         break
       end
