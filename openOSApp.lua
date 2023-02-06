@@ -13,6 +13,7 @@ local portLength = 7
 local chunksLength = 15
 local optionsLength = 18
 local batteryValue = 0
+local posValue = "| X Y Z |"
 local handle
 local logoText = "|-=Bot Yanni=-|"
 local settingsLength = portLength + chunksLength + optionsLength + 3
@@ -96,23 +97,24 @@ end
 event.addHandler(ProgressUpdate)
 
 local bat = layout:addChild(GUI.text(0, 0, 0x78dbe2, 'Заряд: '..batteryValue..'%'))
-function BatteryUpdate(msg13,receiverAddress13,senderAddress13,port13,distance13,message13)
-  if msg13 == "modem_message" and port13 == port.text and message13:sub(1,5) == "bttry" then
+local poss = layout:addChild(GUI.text(0, 0, 0x4B4B4B, posValue))
+function InfoUpdate(msg13,receiverAddress13,senderAddress13,port13,distance13,message13)
+  if msg13 == "modem_message" and port13 == port.text then
     bat:remove()
-    batteryValue = tonumber(message13:sub(6,7))
+    poss:remove()
+    if message13:sub(1,5) == "bttry" then
+      batteryValue = tonumber(message13:sub(6,7))
+    end
+  
+    if message14:sub(1,4) == "poss" then
+      posValue = message14:sub(5,string.len(message14))
+    end
+
     local bat = layout:addChild(GUI.text(0, 0, 0x78dbe2, 'Заряд: '..batteryValue..'%'))
+    local poss = layout:addChild(GUI.text(0, 0, 0x4B4B4B, posValue))
   end
 end
 event.addHandler(BatteryUpdate)
-
-local poss = layout:addChild(GUI.text(0, 0, 0x78dbe2, '| X Y Z |'))
-function PositionUpdate(msg14,receiverAddress14,senderAddress14,port14,distance14,message14)
-  if msg14 == "modem_message" and port14 == port.text and message14:sub(1,4) == "poss" then
-    poss:remove()
-    local poss = layout:addChild(GUI.text(0, 0, 0x78dbe2, message14:sub(5,string.len(message14))))
-  end
-end
-event.addHandler(PositionUpdate)
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 local link = "https://raw.githubusercontent.com/DEFLIK/fukbot/master/init.lua"
 local formatText = "Format disk before setup"
