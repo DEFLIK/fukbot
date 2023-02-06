@@ -618,10 +618,18 @@ home = function(forcibly, interrupt) -- переход к начальной т�
   if enderchest and not forcibly then
     robot.swing(3) -- забрать сундук
   else
---     while energy_level() < 0.98 do -- ждать полного заряда батареи
---       report('INFO: Заряд: '..math.floor(energy_level()*100)..'%')
---       sleep(30)
---     end
+    local prev_energy = 0;
+    local cur_energy = energy_level()
+    while cur_energy < 0.98 do -- ждать полного заряда батареи
+      report('INFO: Заряд: '..math.floor(energy_level()*100)..'%')
+      sleep(30)
+      local prev_energy = cur_energy;
+      local cur_energy = energy_level()
+      if prev_energy == cur_energy then
+        report('WARN: Энергия для заряда не поступает')
+        break
+      end
+    end
   end
   ignore_check = nil
   if not interrupt then
