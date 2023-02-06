@@ -4,7 +4,7 @@ local event = require("event")
 local port = 1339 -- порт для взаимодействия с роботом
 component.modem.open(port)
 print("---------------------------------------------")
-print("Bot Yanni | v0.1.4")
+print("Bot Yanni | v0.1.5")
 print("Порт связи: "..port)
 print("Ожидаем конфигурации с главного компьютера...")
 print("---------------------------------------------")
