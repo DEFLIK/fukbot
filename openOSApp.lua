@@ -106,7 +106,7 @@ function BatteryUpdate(msg13,receiverAddress13,senderAddress13,port13,distance13
 end
 event.addHandler(BatteryUpdate)
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-local link = "https://raw.githubusercontent.com/DEFLIK/fukbot/master/2023.lua"
+local link = "https://raw.githubusercontent.com/DEFLIK/fukbot/master/init.lua"
 local formatText = "Format disk before setup"
 local idText = "First 3 ID char. of selected drive"
 
@@ -114,7 +114,7 @@ layout2:addChild(GUI.text(1, 1, 0x4B4B4B, "Installation"))
 
 local versionBox = layout2:addChild(GUI.comboBox(3, 2, 30, 3, 0xe5e5e5, 0x2D2D2D, 0xCCCCCC, 0x888888))
 versionBox:addItem("Moded").onTouch = function()
-	link = "https://raw.githubusercontent.com/DEFLIK/fukbot/master/2023.lua"
+	link = "https://raw.githubusercontent.com/DEFLIK/fukbot/master/init.lua"
 end
 versionBox:addItem("Original (unconnectable!)").onTouch = function()
 	link = "https://raw.githubusercontent.com/DOOBW/geominer/master/miner.lua"
