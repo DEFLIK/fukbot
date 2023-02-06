@@ -114,7 +114,7 @@ layout2:addChild(GUI.text(1, 1, 0x4B4B4B, "Installation"))
 
 local versionBox = layout2:addChild(GUI.comboBox(3, 2, 30, 3, 0xe5e5e5, 0x2D2D2D, 0xCCCCCC, 0x888888))
 versionBox:addItem("Moded").onTouch = function()
-	link = "https://pastebin.com/raw/KvSdGfr9"
+	link = "https://raw.githubusercontent.com/DEFLIK/fukbot/master/2023.lua"
 end
 versionBox:addItem("Original (unconnectable!)").onTouch = function()
 	link = "https://raw.githubusercontent.com/DOOBW/geominer/master/miner.lua"
