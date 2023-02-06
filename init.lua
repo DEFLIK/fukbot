@@ -1,10 +1,11 @@
 local component = require('component') -- подгрузить обертку из OpenOS
 local computer = require('computer')
 local event = require("event")
-component.modem.open(1339)
+local port = 1339 -- порт для взаимодействия с роботом
+component.modem.open(port)
 print("---------------------------------------------")
 print("Bot Yanni | by 4sv DEFLIK :)")
-print("Порт связи: 1339")
+print("Порт связи: "..port)
 print("Ожидаем конфигурации с главного компьютера...")
 print("---------------------------------------------")
 msg,receiverAddress,senderAddress,port,distance,messageK = event.pull("modem_message")
@@ -15,15 +16,17 @@ print("Дистанция отправки: ", distance)
 print("Робот приступил к рабству...")
 print("---------------------------------------------")
 messageK = tonumber(messageK)
-computer.beep('...')
+computer.beep('.')
 
 local chunks = messageK -- количество чанков для добычи
 local min, max = 2.2, 40 -- минимальная и максимальная плотность
-local port = 1339 -- порт для взаимодействия с роботом
 local X, Y, Z, D, border = 0, 0, 0, 0 -- переменные локальной системы координат
 local steps, turns = 0, 0 -- debug
 local WORLD = {x = {}, y = {}, z = {}} -- таблица меток
 local E_C, W_R = 0, 0 -- энергозатраты на один шаг и скорость износа
+local progress = 0
+local doneScan = false
+local blockSummary = 0
 
 local function arr2a_arr(tbl) -- преобразование списка в ассоциативный массив
   for i = #tbl, 1, -1 do
@@ -35,7 +38,7 @@ local quads = {{-7, -7}, {-7, 1}, {1, -7}, {1, 1}}
 local workbench = {1,2,3,5,6,7,9,10,11}
 local wlist = {'enderstorage:ender_storage'}
 local fragments = {'redstone','coal','dye','diamond','emerald'}
-local tails = {'cobblestone','dirt','gravel','sand','stained_hardened_clay','sandstone','stone','grass','end_stone','hardened_clay','mossy_cobblestone','planks','fence','torch','nether_brick','nether_brick_fence','nether_brick_stairs','netherrack','soul_sand'}
+local tails = {'cobblestone','granite','diorite','andesite','marble','limestone','dirt','gravel','sand','stained_hardened_clay','sandstone','stone','grass','end_stone','hardened_clay','mossy_cobblestone','planks','fence','torch','nether_brick','nether_brick_fence','nether_brick_stairs','netherrack','soul_sand'}
 arr2a_arr(wlist)
 arr2a_arr(fragments)
 arr2a_arr(tails)
@@ -48,6 +51,7 @@ local function add_component(name) -- получение прокси компо
 end
 
 -- загрузка компонентов --
+local checked = true
 local controller = add_component('inventory_controller')
 local chunkloader = add_component('chunkloader')
 local generator = add_component('generator')
@@ -57,12 +61,11 @@ local tunnel = add_component('tunnel')
 local modem = add_component('modem')
 local robot = add_component('robot')
 local inventory = robot.inventorySize()
-local sleep, report, remove_point, check, step, turn, smart_turn, go, scan, calibration, sorter, home, main
+local modemMessage, energy_level, sleep, report, remove_point, check, step, turn, smart_turn, go, scan, calibration, sorter, home, main, solar, ignore_check, inv_check
 
-local function gohome(msg123,receiverAddress123,senderAddress123,port123,distance123,message123)
-  if message123 == "pcgohome1239" then home(truereport('ИНФО:Робот получил принудительный возврат!', true) end
+energy_level = function()
+  return computer.energy()/computer.maxEnergy()
 end
-event.listen("modem_message", gohome)
 
 sleep = function(timeout)
   local deadline = computer.uptime()+timeout
@@ -72,13 +75,22 @@ sleep = function(timeout)
 end
 
 report = function(message, stop) -- рапорт о состоянии
-  message = '|'..X..' '..Y..' '..Z..'|\n'..message -- добавить к сообщению координаты
+  if message:sub(1,1) == "W" then
+    message = 'WARN |'..X..' '..Y..' '..Z..'|: '..message:sub(7,string.len(message)) -- добавить к сообщению координаты
+  end
+  if message:sub(1,1) == "I" then
+    message = 'INFO |'..X..' '..Y..' '..Z..'|: '..message:sub(7,string.len(message)) -- добавить к сообщению координаты
+  end
+  if message:sub(1,1) == "D" then
+    message = 'DONE |'..X..' '..Y..' '..Z..'|: '..message:sub(7,string.len(message)) -- добавить к сообщению координаты
+  end
+  print(message)
   if modem then -- если есть модем
     modem.broadcast(port, message) -- послать сообщение через модем
   elseif tunnel then -- если есть связанная карта
     tunnel.send(message) -- послать сообщение через нее
   end
-  computer.beep('...........') -- пикнуть
+  computer.beep('..') -- пикнуть
   if stop then -- если есть флаг завершения
     if chunkloader then
       chunkloader.setActive(false)
@@ -93,31 +105,67 @@ remove_point = function(point) -- удаление меток
   table.remove(WORLD.z, point)
 end
 
+report("INFO: Связь установлена! Бот приступил к рабству")
+report("INFO: Кол-во чанков: "..messageK.." |  Дистанция отправки:"..distance)
+component.modem.broadcast(port, "prgrs"..0)
+component.modem.broadcast(port, "bttry"..(math.floor((computer.energy()/computer.maxEnergy())*100)))
+
+function modemMessage(eventname, receive, sender, chan, dist, message)
+  if (message == "pcgohome1239") then
+    computer.beep('.')
+    component.modem.broadcast(port, ">Возврат принят<")
+    home(true)
+    component.modem.broadcast(port, ">Bot Yanni достиг начальной позиции, робот отключён<")
+    computer.beep('...')
+    computer.shutdown()
+  end
+end
+event.listen("modem_message", modemMessage)
+
 check = function(forcibly) -- проверка инструмента, батареи, удаление меток
-  gohome()
-  if steps%32 == 0 or forcibly then -- если пройдено 32 шага или включен принудительный режим
+  os.sleep(0)
+  component.modem.broadcast(port, "bttry"..(math.floor((computer.energy()/computer.maxEnergy())*100)))
+  if not ignore_check and (steps%32 == 0 or forcibly) then -- если пройдено 32 шага или включен принудительный режим
+    inv_check()
     local delta = math.abs(X)+math.abs(Y)+math.abs(Z)+64 -- определить расстояние
-    local cx, cy, cz = X, Y, Z -- сохранить текущие координаты
     if robot.durability()/W_R < delta then -- если инструмент изношен
-      report('ВНИМАНИЕ:Инструмент сильно изношен')
+      report('WARN: Инструмент сильно изношен')
+      ignore_check = true
       home(true) -- отправиться домой
     end
     if delta*E_C > computer.energy() then -- проверка уровня энергии
-      report('ВНИМАНИЕ:Малый запас энергии')
+      report('WARN: Малый запас энергии')
+      ignore_check = true
       home(true) -- отправиться домой
     end
-    go(cx, cy, cz) -- вернуться на место
-    if computer.energy()/computer.maxEnergy() < 0.5 then -- если энергии меньше 50%
+    if energy_level() < 0.3 then -- если энергии меньше 30%
+      local time = os.date('*t')
       if generator and generator.count() == 0 and not forcibly then -- если есть генератор
+        report('INFO: Заправка генераторов')
         for slot = 1, inventory do -- обойти инвентарь
           robot.select(slot) -- выбрать слот
-          generator.insert() -- попробовать заправиться
+          for gen in component.list('generator') do -- перебрать все генераторы
+            if component.proxy(gen).insert() then -- попробовать заправиться
+              break
+            end
+          end
         end
-      --[[elseif solar and geolyzer.isSunVisible() then -- проверить видимость солнца
+      elseif solar and geolyzer.isSunVisible() and -- проверить видимость солнца
+        (time.hour > 4 and time.hour < 17) then -- проверить время
         while not geolyzer.canSeeSky() do -- пока не видно неба
-          step(1) -- сделать шаг вверх
+          step(1, true) -- сделать шаг вверх без проверки
         end
-        sleep(60)]]
+        report('INFO: Заряжаюсь на солнце')
+        sorter(true)
+        while (energy_level() < 0.98) and geolyzer.isSunVisible() do
+          time = os.date('*t') -- время работы солнечной панели 05:30 - 18:30
+          if time.hour >= 5 and time.hour < 19 then
+            sleep(60)
+          else
+            break
+          end
+        end
+        report('INFO: Перезарядка на солнце заверешена')
       end
     end
   end
@@ -139,10 +187,11 @@ check = function(forcibly) -- проверка инструмента, бата�
   end
 end
 
-step = function(side) -- функция движения на 1 блок
-  if not robot.swing(side) and robot.detect(side) then -- если блок нельзя разрушить
+step = function(side, ignore) -- функция движения на 1 блок
+  local result, obstacle = robot.swing(side) 
+  if not result and obstacle ~= 'air' and robot.detect(side) then -- если блок нельзя разрушить
     home(true) -- запустить завершающую функцию
-    report('ВНИМАНИЕ:Обнаружено препядствие', true) -- послать сообщение
+    report('WARN: Обнаружено препядствие', true) -- послать сообщение
   else
     while robot.swing(side) do end -- копать пока возможно
   end
@@ -164,7 +213,9 @@ step = function(side) -- функция движения на 1 блок
       end
     end
   end
-  check()
+  if not ignore then
+    check()
+  end
 end
 
 turn = function(side) -- поворот в сторону
@@ -233,13 +284,20 @@ end
 
 calibration = function() -- калибровка при запуске
   if not controller then -- проверить наличие контроллера инвентаря
-    report('Не найден модуль: Inventory controller', true)
+    report('WARN: Не найден модуль: Inventory controller', true)
   elseif not geolyzer then -- проверить наличие геосканера
-    report('Не найден модуль: Geolyzer', true)
+    report('WARN: Не найден модуль: Geolyzer', true)
   elseif not robot.detect(0) then
-    report('ВНИМАНИЕ: Отсутсвует твердый блок под роботом', true)
+    report('WARN: Отсутсвует твердый блок под роботом', true)
   elseif not robot.durability() then
-    report('ВНИМАНИЕ: Отсутсвует инструмент', true)
+    report('WARN: Отсутсвует инструмент', true)
+  end
+  local clist = computer.getDeviceInfo()
+  for i, j in pairs(clist) do
+    if j.description == 'Solar panel' then
+      solar = true
+      break
+    end
   end
   if chunkloader then -- если есть чанклоадер
     chunkloader.setActive(true) -- включить
@@ -284,7 +342,23 @@ calibration = function() -- калибровка при запуске
     end
   end
   if not D then
-    report('ВНИМАНИЕ: Ошибка калибровки', true)
+    report('WARN: Ошибка калибровки', true)
+  end
+end
+
+inv_check = function() -- инвентаризация
+  if ignore_check then
+    return
+  end
+  local items = 0
+  for slot = 1, inventory do
+    if robot.count(slot) > 0 then
+      items = items + 1
+    end
+  end
+  if inventory-items < 10 or items/inventory > 0.9 then
+    while robot.suck(1) do end
+    home(true)
   end
 end
 
@@ -339,6 +413,7 @@ sorter = function(pack) -- сортировка лута
     for o, m in pairs(available) do
       if m > 8 then
         for l = 1, math.ceil(m/576) do
+          inv_check()
           -- очистка рабочей зоны --
           for i = 1, 9 do -- пройти по слотам верстака
             if robot.count(workbench[i]) > 0 then -- если слот не пуст
@@ -393,10 +468,13 @@ sorter = function(pack) -- сортировка лута
     end
   end
   while robot.suck(1) do end --- забрать предметы из буфера
+  inv_check()
 end
 
-home = function(forcibly) -- переход к начальной точке и сброс лута
-  report('ИНФО:Выгруз содержимого...')
+home = function(forcibly, interrupt) -- переход к начальной точке и сброс лута
+  local x, y, z, d
+  report('INFO: Выгруз содержимого...')
+  ignore_check = true
   local enderchest -- обнулить слот с эндерсундуком
   for slot = 1, inventory do -- просканировать инвентарь
     local item = controller.getStackInInternalSlot(slot) -- получить информацию о слоте
@@ -408,11 +486,12 @@ home = function(forcibly) -- переход к начальной точке и 
     end
   end
   if enderchest and not forcibly then -- если есть сундук и нет принудительного возвращения домой
-    step(1) -- подняться на 1 блок
+    -- step(1) -- подняться на 1 блок
     robot.swing(3) -- освободить место для сундука
     robot.select(enderchest) -- выбрать сундук
     robot.place(3) -- поставить сундук
   else
+    x, y, z, d = X, Y, Z, D
     go(0, -2, 0)
     go(0, 0, 0)
   end
@@ -427,7 +506,7 @@ home = function(forcibly) -- переход к начальной точке и 
       turn() -- повернуться
     end
     if not size or size<26 then -- если контейнер не найден
-      report('ВНИМАНИЕ:Не найден сундук') -- послать сообщение
+      report('WARN: Не найден сундук') -- послать сообщение
       sleep(30)
     else
       break -- продолжить работу
@@ -480,7 +559,7 @@ home = function(forcibly) -- переход к начальной точке и 
     end
   end
   if forcibly then
-    report('ИНФО:Ресурсы отправлены в сундук')
+    report('INFO: Ресурсы отправлены в сундук')
     if robot.durability() < 0.3 then -- если прочность инструмента меньше 30%
       robot.select(1) -- выбрать первый слот
       controller.equip() -- поместить инструмент в инвентарь
@@ -497,7 +576,7 @@ home = function(forcibly) -- переход к начальной точке и 
       end
       controller.equip() -- экипировать
     end
-    report('ИНФО:Попытка заменить инструмент')
+    report('INFO: Попытка заменить инструмент')
     if robot.durability() < 0.3 then -- если инструмент не заменился на лучший
       for side = 1, 3 do -- перебрать все стороны
         local name = controller.getInventoryName(3) -- получить имя инвенторя
@@ -516,21 +595,21 @@ home = function(forcibly) -- переход к начальной точке и 
                   controller.equip() -- экипировать
                   break -- остановить зарядку
                 else
-                  report('ИНФО:Робот заряжен на '..math.floor((n_charge+1)/max_charge*100)..'% ')
+                  report('INFO: Робот заряжен на '..math.floor((n_charge+1)/max_charge*100)..'% ')
                 end
               else -- если инструмент не чинится
-                report('ВНИМАНИЕ:Инструмент не может быть заменен', true) -- остановить работу
+                report('WARN: Инструмент не может быть заменен', true) -- остановить работу
               end
             end
           else
-            report('ВНИМАНИЕ:Инструмент не может быть заменен', true) -- остановить работу
+            report('WARN: Инструмент не может быть заменен', true) -- остановить работу
           end
         else
           turn() -- повернуться
         end
       end
       while robot.durability() < 0.3 do
-        report('ВНИМАНИЕ:Нужно заменить инструмент')
+        report('WARN: Нужно заменить инструмент')
         sleep(30)
       end
     end
@@ -538,12 +617,18 @@ home = function(forcibly) -- переход к начальной точке и 
   if enderchest and not forcibly then
     robot.swing(3) -- забрать сундук
   else
-    while computer.energy()/computer.maxEnergy() < 0.98 do -- ждать полного заряда батареи
-      report('ИНФО:Заряд: '..math.floor((computer.energy()/computer.maxEnergy())*100)..'%')
+    while energy_level() < 0.98 do -- ждать полного заряда батареи
+      report('INFO: Заряд: '..math.floor(energy_level()*100)..'%')
       sleep(30)
     end
   end
-  report('ИНФО:Возвращение к рабству')
+  ignore_check = nil
+  if not interrupt then
+    report('INFO: Возвращение к рабству')
+    go(0, -2, 0)
+    go(x, y, z)
+    smart_turn(d)
+  end
 end
 
 main = function()
@@ -558,6 +643,7 @@ main = function()
   while #WORLD.x ~= 0 do
     local n_delta, c_delta, current = math.huge, math.huge
     for index = 1, #WORLD.x do
+      progress = progress + 1
       n_delta = math.abs(X-WORLD.x[index])+math.abs(Y-WORLD.y[index])+math.abs(Z-WORLD.z[index])-border+WORLD.y[index]
       if (WORLD.x[index] > X and D ~= 3) or
       (WORLD.x[index] < X and D ~= 1) or
@@ -569,6 +655,16 @@ main = function()
         c_delta, current = n_delta, index
       end
     end
+    if doneScan == false then
+      blockSummary = progress
+      doneScan = true
+    end
+    progress = 100 - (progress - 1) / blockSummary * 100
+    component.modem.broadcast(1339, "prgrs"..progress)
+    if progress == 100 then
+      doneScan = false
+    end
+    progress = 0
     if WORLD.x[current] == X and WORLD.y[current] == Y and WORLD.z[current] == Z then
       remove_point(current)
     else
@@ -592,12 +688,13 @@ for o = 1, 10 do -- цикл ограничения спирали
   for i = 1, 2 do -- цикл обновления координат
     for a = 1, o do -- цикл перехода по линии спирали
       main() -- запуск функции сканирования и добычи
-      report('ИНФО:Чанк #'..pos[3]+1 ..' обработан') -- сообщить о завершении работы в чанке
+      report('INFO: Чанк #'..pos[3]+1 ..' обработан') -- сообщить о завершении работы в чанке
       pos[i], pos[3] = pos[i] + pos[0], pos[3] + 1 -- обновить координаты
       if pos[3] == chunks then -- если достигнут последний чанк
-        home(true) -- возврат домой
-        report(computer.uptime()-Tau..' Секунд\nДлина патча: '..steps..'\nСделано поворотов: '..turns, true) -- сообщить о завершении работы
+        home(true, true) -- возврат домой
+        report('DONE: '..computer.uptime()-Tau..' Секунд | Длина патча: '..steps, true) -- сообщить о завершении работы '\nСделано поворотов: '..turns
       else -- иначе
+        WORLD = {x = {}, y = {}, z = {}} 
         go(pos[1]*16, -2, pos[2]*16) -- перейти к следующему чанку
         go(X, 0, Z) -- перейти в стартовую точку сканирования
       end
