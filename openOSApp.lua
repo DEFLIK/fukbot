@@ -106,7 +106,7 @@ function BatteryUpdate(msg13,receiverAddress13,senderAddress13,port13,distance13
 end
 event.addHandler(BatteryUpdate)
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-local link = "https://pastebin.com/raw/KvSdGfr9"
+local link = "https://raw.githubusercontent.com/DEFLIK/fukbot/master/2023.lua"
 local formatText = "Format disk before setup"
 local idText = "First 3 ID char. of selected drive"
 
