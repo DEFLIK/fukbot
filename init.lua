@@ -4,7 +4,7 @@ local event = require("event")
 local port = 1339 -- порт для взаимодействия с роботом
 component.modem.open(port)
 print("---------------------------------------------")
-print("Bot Yanni | v0.2.1")
+print("Bot Yanni | v0.2.2")
 print("Порт связи: "..port)
 print("Ожидаем конфигурации с главного компьютера...")
 print("---------------------------------------------")
@@ -620,6 +620,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
   else
     local prev_energy = 0;
     local cur_energy = energy_level()
+    report('INFO: Пополнение заряда, ожидание...')
     while cur_energy < 0.98 do -- ждать полного заряда батареи
       component.modem.broadcast(port, "bttry"..(math.floor((computer.energy()/computer.maxEnergy())*100)))
       sleep(30)
